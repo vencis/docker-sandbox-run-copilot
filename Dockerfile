@@ -106,6 +106,19 @@ ARG COPILOT_VERSION
 RUN npm install -g @github/copilot@${COPILOT_VERSION}
 
 # =============================================================================
+# Install OpenShift CLI (oc)
+# =============================================================================
+RUN curl -sL -o /tmp/oc.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable/openshift-client-linux.tar.gz \
+    && tar -xzf /tmp/oc.tar.gz -C /usr/local/bin oc kubectl \
+    && chmod +x /usr/local/bin/oc /usr/local/bin/kubectl \
+    && rm -f /tmp/oc.tar.gz
+
+# =============================================================================
+# Install Helm
+# =============================================================================
+RUN curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+# =============================================================================
 # Set up user environment
 # =============================================================================
 USER agent
