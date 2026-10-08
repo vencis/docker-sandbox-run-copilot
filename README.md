@@ -1,7 +1,7 @@
 # Docker Sandbox Template for GitHub Copilot CLI
 
-[![Copilot CLI](https://img.shields.io/badge/Copilot_CLI-1.0.81-blue?logo=githubcopilot&logoColor=white)](https://github.com/github/copilot-cli)
-[![Docker Image](https://img.shields.io/badge/docker-ghcr.io%2Fhenrybravo%2Fdocker--sandbox--run--copilot-blue?logo=docker&logoColor=white)](https://github.com/henrybravo/docker-sandbox-run-copilot/pkgs/container/docker-sandbox-run-copilot)
+[![Copilot CLI](https://img.shields.io/badge/Copilot_CLI-1.0.92-blue?logo=githubcopilot&logoColor=white)](https://github.com/github/copilot-cli)
+[![Docker Image](https://img.shields.io/badge/docker-ghcr.io%2Fvencis%2Fdocker--sandbox--run--copilot-blue?logo=docker&logoColor=white)](https://github.com/vencis/docker-sandbox-run-copilot/pkgs/container/docker-sandbox-run-copilot)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A Docker sandbox template for running [GitHub Copilot CLI](https://github.com/github/copilot-cli) in an isolated environment. 
@@ -11,7 +11,7 @@ A Docker sandbox template for running [GitHub Copilot CLI](https://github.com/gi
 You can use this template:
 
 ```bash
-docker sandbox run --template ghcr.io/henrybravo/docker-sandbox-run-copilot copilot .
+docker sandbox run --template ghcr.io/vencis/docker-sandbox-run-copilot copilot .
 ```
 
 or just run 
@@ -49,10 +49,10 @@ Docker Desktop 4.50+ introduced `docker sandbox run` which allows running AI cod
 
 ```bash
 # Run Copilot CLI in your current directory
-docker sandbox run --template ghcr.io/henrybravo/docker-sandbox-run-copilot copilot .
+docker sandbox run --template ghcr.io/vencis/docker-sandbox-run-copilot copilot .
 
 # Run in a specific workspace
-docker sandbox run --template ghcr.io/henrybravo/docker-sandbox-run-copilot copilot ~/my-project
+docker sandbox run --template ghcr.io/vencis/docker-sandbox-run-copilot copilot ~/my-project
 ```
 
 ### Option 2: Using Docker Run (Standalone)
@@ -62,14 +62,14 @@ docker sandbox run --template ghcr.io/henrybravo/docker-sandbox-run-copilot copi
 docker run -it --rm \
   -v $(pwd):/workspace \
   -e GITHUB_TOKEN="your-token" \
-  ghcr.io/henrybravo/docker-sandbox-run-copilot \
+  ghcr.io/vencis/docker-sandbox-run-copilot \
   copilot
 
 # With a prompt
 docker run -it --rm \
   -v $(pwd):/workspace \
   -e GITHUB_TOKEN="your-token" \
-  ghcr.io/henrybravo/docker-sandbox-run-copilot \
+  ghcr.io/vencis/docker-sandbox-run-copilot \
   "explain what this codebase does"
 ```
 
@@ -77,11 +77,14 @@ docker run -it --rm \
 
 ```bash
 # Clone the repository
-git clone https://github.com/henrybravo/docker-sandbox-run-copilot.git
+git clone https://github.com/vencis/docker-sandbox-run-copilot.git
 cd docker-sandbox-run-copilot
 
-# Build the image
-docker build -t copilot-sandbox .
+# Build the image with your current user and group IDs
+docker build \
+  --build-arg AGENT_UID="$(id -u)" \
+  --build-arg AGENT_GID="$(id -g)" \
+  -t copilot-sandbox .
 
 # Run
 docker run -it --rm \
@@ -101,7 +104,7 @@ GitHub Copilot CLI requires authentication with your GitHub account. There are s
 export GITHUB_TOKEN="ghp_xxxxxxxxxxxxxxxxxxxx"
 
 # Run the sandbox
-docker sandbox run --template ghcr.io/henrybravo/docker-sandbox-run-copilot \
+docker sandbox run --template ghcr.io/vencis/docker-sandbox-run-copilot \
   -e GITHUB_TOKEN="$GITHUB_TOKEN" \
   copilot .
 ```
@@ -111,7 +114,7 @@ docker sandbox run --template ghcr.io/henrybravo/docker-sandbox-run-copilot \
 If no token is provided, Copilot CLI will prompt you to authenticate:
 
 ```bash
-docker sandbox run --template ghcr.io/henrybravo/docker-sandbox-run-copilot copilot .
+docker sandbox run --template ghcr.io/vencis/docker-sandbox-run-copilot copilot .
 # Then use /login command inside Copilot CLI
 ```
 
@@ -130,7 +133,7 @@ echo "ghp_xxxxxxxxxxxx" | docker run -i --rm \
 docker run -it --rm \
   -v $(pwd):/workspace \
   -v copilot-credentials:/mnt/copilot-data \
-  ghcr.io/henrybravo/docker-sandbox-run-copilot
+  ghcr.io/vencis/docker-sandbox-run-copilot
 ```
 
 ### Creating a GitHub PAT for Copilot
@@ -160,13 +163,13 @@ Pass agent arguments after the `--` separator:
 
 ```bash
 # Pass a prompt directly
-docker sandbox run --template ghcr.io/henrybravo/docker-sandbox-run-copilot copilot . -- --prompt "fix the bug in main.py"
+docker sandbox run --template ghcr.io/vencis/docker-sandbox-run-copilot copilot . -- --prompt "fix the bug in main.py"
 
 # Add directory context
-docker sandbox run --template ghcr.io/henrybravo/docker-sandbox-run-copilot copilot . -- --add-dir /workspace/src
+docker sandbox run --template ghcr.io/vencis/docker-sandbox-run-copilot copilot . -- --add-dir /workspace/src
 
 # Enable debug logging
-docker sandbox run --template ghcr.io/henrybravo/docker-sandbox-run-copilot copilot . -- --log-level debug
+docker sandbox run --template ghcr.io/vencis/docker-sandbox-run-copilot copilot . -- --log-level debug
 ```
 
 ## 📦 What's Included
@@ -189,7 +192,7 @@ The sandbox image includes:
 To give Copilot CLI access to Docker commands:
 
 ```bash
-docker sandbox run --template ghcr.io/henrybravo/docker-sandbox-run-copilot \
+docker sandbox run --template ghcr.io/vencis/docker-sandbox-run-copilot \
   --mount-docker-socket \
   copilot .
 ```
@@ -209,7 +212,7 @@ Copilot CLI supports MCP (Model Context Protocol) servers. You can add custom se
 ### Mounting Additional Volumes
 
 ```bash
-docker sandbox run --template ghcr.io/henrybravo/docker-sandbox-run-copilot \
+docker sandbox run --template ghcr.io/vencis/docker-sandbox-run-copilot \
   -v ~/datasets:/data:ro \
   -v ~/models:/models \
   copilot .
@@ -218,7 +221,7 @@ docker sandbox run --template ghcr.io/henrybravo/docker-sandbox-run-copilot \
 ### Using a Different Model
 
 ```bash
-docker sandbox run --template ghcr.io/henrybravo/docker-sandbox-run-copilot \
+docker sandbox run --template ghcr.io/vencis/docker-sandbox-run-copilot \
   -e COPILOT_MODEL=gpt-5 \
   copilot .
 ```
@@ -228,7 +231,7 @@ docker sandbox run --template ghcr.io/henrybravo/docker-sandbox-run-copilot \
 Extend this template for your specific needs:
 
 ```dockerfile
-FROM ghcr.io/henrybravo/docker-sandbox-run-copilot:latest
+FROM ghcr.io/vencis/docker-sandbox-run-copilot:latest
 
 # Add your custom tools
 RUN npm install -g typescript ts-node
@@ -272,8 +275,8 @@ For persistent development environments, use `docker-compose.yml`:
 cp .env.example .env
 # Edit .env with your GITHUB_TOKEN
 
-# Start the sandbox in background
-docker compose up -d
+# Start the sandbox in background using your current user and group IDs
+AGENT_UID="$(id -u)" AGENT_GID="$(id -g)" docker compose up -d --build
 
 # Enter the running container
 docker compose exec copilot bash
@@ -295,7 +298,7 @@ Contributions are welcome! Please feel free to submit issues and pull requests.
 
 ```bash
 # Clone the repo
-git clone https://github.com/henrybravo/docker-sandbox-run-copilot.git
+git clone https://github.com/vencis/docker-sandbox-run-copilot.git
 cd docker-sandbox-run-copilot
 
 # Build and test locally

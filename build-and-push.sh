@@ -43,7 +43,15 @@ if [[ ! -f "$VERSION_FILE" ]]; then
 fi
 
 COPILOT_VERSION=$(cat "$VERSION_FILE" | tr -d '[:space:]')
+AGENT_UID="${SUDO_UID:-$(id -u)}"
+AGENT_GID="${SUDO_GID:-$(id -g)}"
+BUILD_PROXY_ARGS=()
+if [[ -n "${https_proxy:-}" ]]; then
+    export HTTPS_PROXY="$https_proxy"
+    BUILD_PROXY_ARGS+=(--build-arg HTTPS_PROXY)
+fi
 echo "Building with Copilot CLI version: $COPILOT_VERSION"
+echo "Building with agent UID:GID: $AGENT_UID:$AGENT_GID"
 
 # Ensure buildx is available
 if ! docker buildx version &>/dev/null; then
@@ -76,6 +84,9 @@ if [[ "$PUSH" == true ]]; then
     docker buildx build \
         --platform "$PLATFORM" \
         --build-arg COPILOT_VERSION="$COPILOT_VERSION" \
+        --build-arg AGENT_UID="$AGENT_UID" \
+        --build-arg AGENT_GID="$AGENT_GID" \
+        "${BUILD_PROXY_ARGS[@]}" \
         $TAGS \
         --push \
         "$SCRIPT_DIR"
@@ -97,6 +108,9 @@ else
     docker buildx build \
         --platform "$PLATFORM" \
         --build-arg COPILOT_VERSION="$COPILOT_VERSION" \
+        --build-arg AGENT_UID="$AGENT_UID" \
+        --build-arg AGENT_GID="$AGENT_GID" \
+        "${BUILD_PROXY_ARGS[@]}" \
         $TAGS \
         --load \
         "$SCRIPT_DIR"

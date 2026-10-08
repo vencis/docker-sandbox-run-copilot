@@ -3,15 +3,22 @@
 
 # Read Copilot CLI version from .copilot-version file
 COPILOT_VERSION := $(shell cat .copilot-version 2>/dev/null || echo "latest")
+AGENT_UID ?= $(shell if [ -n "$$SUDO_UID" ]; then echo "$$SUDO_UID"; else id -u; fi)
+AGENT_GID ?= $(shell if [ -n "$$SUDO_GID" ]; then echo "$$SUDO_GID"; else id -g; fi)
+BUILD_PROXY_ARGS = $(if $(https_proxy),--build-arg HTTPS_PROXY)
+export HTTPS_PROXY = $(https_proxy)
 
 # Image configuration
-IMAGE_NAME ?= ghcr.io/henrybravo/docker-sandbox-run-copilot
+IMAGE_NAME ?= local/vencis/docker-sandbox-run-copilot
 VERSION ?= $(COPILOT_VERSION)
 
 # Build the Docker image
 build:
 	@echo "Building Docker image $(IMAGE_NAME):$(VERSION)..."
 	docker build --build-arg COPILOT_VERSION=$(COPILOT_VERSION) \
+		--build-arg AGENT_UID=$(AGENT_UID) \
+		--build-arg AGENT_GID=$(AGENT_GID) \
+		$(BUILD_PROXY_ARGS) \
 		-t $(IMAGE_NAME):$(VERSION) \
 		-t $(IMAGE_NAME):latest .
 
@@ -20,6 +27,9 @@ build-multi:
 	@echo "Building multi-platform Docker image $(IMAGE_NAME):$(VERSION)..."
 	docker buildx build --platform linux/amd64,linux/arm64 \
 		--build-arg COPILOT_VERSION=$(COPILOT_VERSION) \
+		--build-arg AGENT_UID=$(AGENT_UID) \
+		--build-arg AGENT_GID=$(AGENT_GID) \
+		$(BUILD_PROXY_ARGS) \
 		-t $(IMAGE_NAME):$(VERSION) \
 		-t $(IMAGE_NAME):latest .
 
@@ -28,26 +38,40 @@ run:
 	@echo "Running Copilot CLI sandbox..."
 	docker run -it --rm \
 		-v $(PWD):/workspace \
-		-e GITHUB_TOKEN=$(GITHUB_TOKEN) \
+		-e https_proxy \
+		-v ${SSH_AUTH_SOCK}:/ssh-agent:ro \
+		-e SSH_AUTH_SOCK=/ssh-agent \
+		-e GITHUB_TOKEN=$(GITHUB_COPILOT_TOKEN) \
 		-e GIT_USER_NAME="$(shell git config user.name)" \
 		-e GIT_USER_EMAIL="$(shell git config user.email)" \
-		$(IMAGE_NAME):$(VERSION)
+		$(IMAGE_NAME):$(VERSION) \
+		copilot --no-auto-update
 
 # Run with bash shell
 shell:
 	@echo "Starting bash shell in sandbox..."
 	docker run -it --rm \
 		-v $(PWD):/workspace \
-		-e GITHUB_TOKEN=$(GITHUB_TOKEN) \
-		$(IMAGE_NAME):$(VERSION) bash
+		-e https_proxy \
+		-e GITHUB_TOKEN=$(GITHUB_COPILOT_TOKEN) \
+		$(IMAGE_NAME):$(VERSION) \
+		bash
 
 # Run tests
 test:
 	@echo "Running tests..."
-	docker build --build-arg COPILOT_VERSION=$(COPILOT_VERSION) -t $(IMAGE_NAME):test .
+	docker build --build-arg COPILOT_VERSION=$(COPILOT_VERSION) \
+		--build-arg AGENT_UID=$(AGENT_UID) \
+		--build-arg AGENT_GID=$(AGENT_GID) \
+		$(BUILD_PROXY_ARGS) \
+		-t $(IMAGE_NAME):test .
 	docker run --rm $(IMAGE_NAME):test bash -c '\
 		echo "=== Testing Copilot Sandbox ===" && \
 		echo "Copilot Version: $(COPILOT_VERSION)" && \
+		echo "Agent UID: $$(id -u)" && \
+		echo "Agent GID: $$(id -g)" && \
+		test "$$(id -u)" -eq "$(AGENT_UID)" && \
+		test "$$(id -g)" -eq "$(AGENT_GID)" && \
 		echo "Node: $$(node --version)" && \
 		echo "npm: $$(npm --version)" && \
 		echo "Copilot CLI: $$(which copilot)" && \
@@ -100,4 +124,5 @@ help:
 	@echo "  COPILOT_VERSION  Copilot CLI version (from .copilot-version: $(COPILOT_VERSION))"
 	@echo "  IMAGE_NAME       Container image name (default: $(IMAGE_NAME))"
 	@echo "  VERSION          Image version tag (default: $(VERSION))"
-	@echo "  GITHUB_TOKEN     GitHub token for Copilot CLI authentication"
+	@echo "  AGENT_UID/GID    Container user/group IDs (default: current user)"
+	@echo "  GITHUB_COPILOT_TOKEN     GitHub token for Copilot CLI authentication"

@@ -95,7 +95,13 @@ RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /
 # =============================================================================
 # Create non-root user 'agent' with sudo access (matching Docker sandbox conventions)
 # =============================================================================
-RUN useradd -m -s /bin/bash -G sudo agent \
+ARG AGENT_UID=1000
+ARG AGENT_GID=1000
+RUN set -eux; \
+    if ! getent group "${AGENT_GID}" >/dev/null; then \
+        groupadd --gid "${AGENT_GID}" agent; \
+    fi; \
+    useradd --uid "${AGENT_UID}" --gid "${AGENT_GID}" -m -s /bin/bash -G sudo agent \
     && echo "agent ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/agent \
     && chmod 0440 /etc/sudoers.d/agent
 

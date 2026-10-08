@@ -38,6 +38,8 @@ jobs:
           COPILOT_VERSION=$(cat .copilot-version)
           echo "version=$COPILOT_VERSION" >> $GITHUB_OUTPUT
           echo "Copilot CLI version: $COPILOT_VERSION"
+          echo "agent_uid=$(id -u)" >> $GITHUB_OUTPUT
+          echo "agent_gid=$(id -g)" >> $GITHUB_OUTPUT
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -78,6 +80,8 @@ jobs:
             org.opencontainers.image.title=Docker Sandbox Template for GitHub Copilot CLI
           build-args: |
             COPILOT_VERSION=${{ steps.copilot-version.outputs.version }}
+            AGENT_UID=${{ steps.copilot-version.outputs.agent_uid }}
+            AGENT_GID=${{ steps.copilot-version.outputs.agent_gid }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
