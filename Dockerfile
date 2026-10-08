@@ -98,12 +98,25 @@ RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /
 ARG AGENT_UID=1000
 ARG AGENT_GID=1000
 RUN set -eux; \
-    if ! getent group "${AGENT_GID}" >/dev/null; then \
+    test "${AGENT_UID}" -ne 0; \
+    test "${AGENT_GID}" -ne 0; \
+    existing_group="$(getent group "${AGENT_GID}" | cut -d: -f1)"; \
+    if [ -n "${existing_group}" ]; then \
+        if [ "${existing_group}" != agent ]; then \
+            groupmod --new-name agent "${existing_group}"; \
+        fi; \
+    else \
         groupadd --gid "${AGENT_GID}" agent; \
     fi; \
-    useradd --uid "${AGENT_UID}" --gid "${AGENT_GID}" -m -s /bin/bash -G sudo agent \
-    && echo "agent ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/agent \
-    && chmod 0440 /etc/sudoers.d/agent
+    existing_user="$(getent passwd "${AGENT_UID}" | cut -d: -f1)"; \
+    if [ -n "${existing_user}" ]; then \
+        usermod --login agent --gid "${AGENT_GID}" --home /home/agent \
+            --move-home --shell /bin/bash --append --groups sudo "${existing_user}"; \
+    else \
+        useradd --uid "${AGENT_UID}" --gid "${AGENT_GID}" -m -s /bin/bash -G sudo agent; \
+    fi; \
+    echo "agent ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/agent; \
+    chmod 0440 /etc/sudoers.d/agent
 
 # =============================================================================
 # Install GitHub Copilot CLI globally
