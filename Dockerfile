@@ -159,12 +159,6 @@ ENV PATH="/home/agent/.npm-global/bin:$PATH"
 ENV NPM_CONFIG_PREFIX=/home/agent/.npm-global
 
 # =============================================================================
-# Add custom MCP servers
-# =============================================================================
-RUN npm install -g ssh-mcp@latest
-RUN npm install -g kubernetes-mcp-server@latest
-
-# =============================================================================
 # Configure shell
 # =============================================================================
 COPY --chown=agent:agent bashrc.sandbox /home/agent/.bashrc.sandbox
