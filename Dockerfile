@@ -159,8 +159,8 @@ ENV PATH="/home/agent/.npm-global/bin:$PATH"
 ENV NPM_CONFIG_PREFIX=/home/agent/.npm-global
 
 
-COPY --chown=agent:agent conf/mcp-config.json /home/agent/.copilot/mcp-config.json
-COPY --chown=agent:agent conf/ssh-mcp/config.toml /home/agent/.config/ssh-mcp/config.toml
+COPY --chown=agent:agent --chmod=600 conf/mcp-config.json /home/agent/.copilot/mcp-config.json
+COPY --chown=agent:agent --chmod=600 conf/ssh-mcp/config.toml /home/agent/.config/ssh-mcp/config.toml
 
 
 # =============================================================================
