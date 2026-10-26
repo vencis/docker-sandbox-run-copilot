@@ -124,18 +124,19 @@ RUN set -eux; \
 ARG COPILOT_VERSION
 RUN npm install -g @github/copilot@${COPILOT_VERSION}
 
-# =============================================================================
-# Install OpenShift CLI (oc)
-# =============================================================================
-RUN curl -sL -o /tmp/oc.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable/openshift-client-linux.tar.gz \
-    && tar -xzf /tmp/oc.tar.gz -C /usr/local/bin oc kubectl \
-    && chmod +x /usr/local/bin/oc /usr/local/bin/kubectl \
-    && rm -f /tmp/oc.tar.gz
 
-# =============================================================================
-# Install Helm
-# =============================================================================
-RUN curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+# # =============================================================================
+# # Install OpenShift CLI (oc)
+# # =============================================================================
+# RUN curl -sL -o /tmp/oc.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable/openshift-client-linux.tar.gz \
+#     && tar -xzf /tmp/oc.tar.gz -C /usr/local/bin oc kubectl \
+#     && chmod +x /usr/local/bin/oc /usr/local/bin/kubectl \
+#     && rm -f /tmp/oc.tar.gz
+
+# # =============================================================================
+# # Install Helm
+# # =============================================================================
+# RUN curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
 # =============================================================================
 # Set up user environment
@@ -156,6 +157,12 @@ ENV XDG_DATA_HOME=/home/agent/.local/share
 # Add npm global bin to PATH
 ENV PATH="/home/agent/.npm-global/bin:$PATH"
 ENV NPM_CONFIG_PREFIX=/home/agent/.npm-global
+
+# =============================================================================
+# Add custom MCP servers
+# =============================================================================
+RUN npm install -g ssh-mcp@latest
+RUN npm install -g kubernetes-mcp-server@latest
 
 # =============================================================================
 # Configure shell
