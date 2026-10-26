@@ -158,8 +158,11 @@ ENV XDG_DATA_HOME=/home/agent/.local/share
 ENV PATH="/home/agent/.npm-global/bin:$PATH"
 ENV NPM_CONFIG_PREFIX=/home/agent/.npm-global
 
-
-COPY --chown=agent:agent --chmod=600 conf/mcp-config.json /home/agent/.copilot/mcp-config.json
+# =============================================================================
+# MCP configuration
+# =============================================================================
+RUN install -d -m 700                                         /home/agent/.config/ssh-mcp
+COPY --chown=agent:agent             conf/mcp-config.json     /home/agent/.copilot/mcp-config.json
 COPY --chown=agent:agent --chmod=600 conf/ssh-mcp/config.toml /home/agent/.config/ssh-mcp/config.toml
 
 

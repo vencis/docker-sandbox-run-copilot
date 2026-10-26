@@ -1,0 +1,12 @@
+[defaults]
+defaultProfile = "dev"
+approvalMode = "ask-destructive"
+
+[[profiles]]
+name = "dev"
+host = "some.hostname.com"
+port = 22
+user = "john.doe"           # NOT root!
+auth = "agent"
+role = "admin"
+approvalPolicy = "auto"     # dev is permissive
