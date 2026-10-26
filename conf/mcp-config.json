@@ -1,11 +1,12 @@
 {
   "mcpServers": {
-    "ssh-mcp": {
-      "type": "local",
+    "ssh": {
       "command": "npx",
-      "args": ["ssh-mcp"],
-      "env": {},
-      "tools": ["*"]
+      "args": ["-y", "ssh-mcp@latest"]
+    },
+    "kubernetes": {
+      "command": "npx",
+      "args": ["-y", "kubernetes-mcp-server@latest"]
     }
   }
 }
