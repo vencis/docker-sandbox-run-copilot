@@ -161,9 +161,11 @@ ENV NPM_CONFIG_PREFIX=/home/agent/.npm-global
 # =============================================================================
 # MCP configuration
 # =============================================================================
-RUN install -d -m 700                                         /home/agent/.config/ssh-mcp
-COPY --chown=agent:agent             conf/mcp-config.json     /home/agent/.copilot/mcp-config.json
-COPY --chown=agent:agent --chmod=600 conf/ssh-mcp/config.toml /home/agent/.config/ssh-mcp/config.toml
+RUN install -d -m 700 /home/agent/.config/ssh-mcp /home/agent/.config/kubernetes-mcp-server
+COPY --chown=agent:agent             conf/mcp-config.json                   /home/agent/.copilot/mcp-config.json
+COPY --chown=agent:agent --chmod=600 conf/ssh-mcp/config.toml               /home/agent/.config/ssh-mcp/config.toml
+COPY --chown=agent:agent --chmod=600 conf/kubernetes-mcp-server/config.toml /home/agent/.config/kubernetes-mcp-server/config.toml
+
 
 
 # =============================================================================

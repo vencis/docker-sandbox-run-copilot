@@ -40,10 +40,12 @@ run:
 		-v $(PWD):/workspace \
 		-e https_proxy \
 		-v ${SSH_AUTH_SOCK}:/ssh-agent:ro \
+		-v ${HOME}/.kube/config:/home/agent/.kube/config:ro \
 		-e SSH_AUTH_SOCK=/ssh-agent \
 		-e GITHUB_TOKEN=$(GITHUB_COPILOT_TOKEN) \
 		-e GIT_USER_NAME="$(shell git config user.name)" \
 		-e GIT_USER_EMAIL="$(shell git config user.email)" \
+		-e KUBECONFIG=/home/agent/.kube/config \
 		$(IMAGE_NAME):$(VERSION) \
 		copilot --no-auto-update
 
