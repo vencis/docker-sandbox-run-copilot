@@ -158,6 +158,13 @@ ENV XDG_DATA_HOME=/home/agent/.local/share
 ENV PATH="/home/agent/.npm-global/bin:$PATH"
 ENV NPM_CONFIG_PREFIX=/home/agent/.npm-global
 
+
+# =============================================================================
+# Install MCP servers (for SSH-based and Kubernetes-based MCP servers)
+# =============================================================================
+RUN npm install -g ssh-mcp@2.22.0
+RUN npm install -g kubernetes-mcp-server@0.1.1
+
 # =============================================================================
 # MCP configuration
 # =============================================================================

@@ -1,20 +1,12 @@
 {
   "mcpServers": {
     "ssh": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "ssh-mcp@latest"
-      ]
+      "command": "ssh-mcp",
+      "args": []
     },
     "kubernetes": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "kubernetes-mcp-server@latest",
-        "--config",
-        "/home/agent/.config/kubernetes-mcp-server/config.toml"
-      ]
+      "command": "kubernetes-mcp-server",
+      "args": []
     }
   }
 }
