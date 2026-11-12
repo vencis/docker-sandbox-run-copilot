@@ -41,6 +41,8 @@ run:
 		-e https_proxy \
 		-v ${SSH_AUTH_SOCK}:/ssh-agent:ro \
 		-v ${HOME}/.kube/config:/home/agent/.kube/config:ro \
+		-v $(PWD)/conf/ssh-mcp/config.toml:/home/agent/.config/ssh-mcp/config.toml:ro \
+		-v $(PWD)/conf/kubernetes-mcp-server/config.toml:/home/agent/.config/kubernetes-mcp-server/config.toml:ro \
 		-e SSH_AUTH_SOCK=/ssh-agent \
 		-e GITHUB_TOKEN=$(GITHUB_COPILOT_TOKEN) \
 		-e GIT_USER_NAME="$(shell git config user.name)" \

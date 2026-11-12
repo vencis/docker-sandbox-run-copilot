@@ -146,6 +146,11 @@ docker run -it --rm \
 
 ## 🛠️ Configuration
 
+`make run` mounts `conf/ssh-mcp/config.toml` and
+`conf/kubernetes-mcp-server/config.toml` read-only into the container. Create
+these local files from the corresponding `config.EXAMPLE.toml` files; they are
+not copied into the Docker image.
+
 ### Environment Variables
 
 | Variable | Description | Required |
