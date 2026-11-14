@@ -5,7 +5,6 @@ sessionBackgroundMaxMs = 3600000    # 1hr absolute cap; 0 = no cap
 commandTimeoutMs = 60000
 commandMaxChars = 5000              # 0 = unlimited, the config spelling of --maxChars=none
 commandMaxOutputBytes = 1048576     # 1MB
-commandOutputTruncation = "head"    # head | tail; see below
 connectionIdleReapMs = 900000       # 15min
 commandQuotaPerDay = 0              # 0 = unlimited; circuit breaker for runaway agents
 approvalGrantTtlMs = 0              # 0 = always prompt; see "Approval Grants"
