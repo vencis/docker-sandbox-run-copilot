@@ -3,6 +3,7 @@
 
 # Read Copilot CLI version from .copilot-version file
 COPILOT_VERSION := $(shell cat .copilot-version 2>/dev/null || echo "latest")
+MAKEFILE_DIR := $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 AGENT_UID ?= $(shell if [ -n "$$SUDO_UID" ]; then echo "$$SUDO_UID"; else id -u; fi)
 AGENT_GID ?= $(shell if [ -n "$$SUDO_GID" ]; then echo "$$SUDO_GID"; else id -g; fi)
 BUILD_PROXY_ARGS = $(if $(https_proxy),--build-arg HTTPS_PROXY)
@@ -41,8 +42,8 @@ run:
 		-e https_proxy \
 		-v ${SSH_AUTH_SOCK}:/ssh-agent:ro \
 		-v ${HOME}/.kube/config:/home/agent/.kube/config:ro \
-		-v $(PWD)/conf/ssh-mcp/config.toml:/home/agent/.config/ssh-mcp/config.toml:ro \
-		-v $(PWD)/conf/kubernetes-mcp-server/config.toml:/home/agent/.config/kubernetes-mcp-server/config.toml:ro \
+		-v $(MAKEFILE_DIR)/conf/ssh-mcp/config.toml:/home/agent/.config/ssh-mcp/config.toml:ro \
+		-v $(MAKEFILE_DIR)/conf/kubernetes-mcp-server/config.toml:/home/agent/.config/kubernetes-mcp-server/config.toml:ro \
 		-e SSH_AUTH_SOCK=/ssh-agent \
 		-e GITHUB_TOKEN=$(GITHUB_COPILOT_TOKEN) \
 		-e GIT_USER_NAME="$(shell git config user.name)" \
